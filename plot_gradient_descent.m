@@ -1,9 +1,6 @@
-% Function containing two prominent local minima.
-f = @(x, y) (0.2 * x .* (sin(0.2 * x.^2 + 0.5 * x) + 1)) + (0.1 * y.^2 .* sin(y + 0.1 * x.^3) + 1) - 3 * exp(-(1 * x.^2 + 0.5 * y.^2)) - 1.5 * exp(-5 * (2 * (x-1.5).^2 + (y-1).^2)) + 2;
-
 [x, y] = meshgrid(linspace(-3.5, 3.5, 100));
 
-z = f(x, y);
+z = mountainRange(x, y);
 
 surf(x, y, z);
 hold on;
@@ -34,12 +31,14 @@ function [x_path, y_path] = perform_gradient_descent(x, y, z, x0, y0, alpha, num
     end
 end
 
-function plot_path(x_path, y_path, f, color)
+function plot_path(x_path, y_path, color)
     path_elevation = 0.1;
-    plot3(x_path, y_path, f(x_path, y_path) + path_elevation, strcat(color, '-'), 'LineWidth', 2); % Path line
-    quiver3(x_path(1:end-1), y_path(1:end-1), f(x_path(1:end-1), y_path(1:end-1)), ...
-            x_path(2:end)-x_path(1:end-1), y_path(2:end)-y_path(1:end-1), f(x_path(2:end), y_path(2:end))-f(x_path(1:end-1), y_path(1:end-1)) + path_elevation, ...
-            0.5, color, 'LineWidth', 1.5);
+    plot3(x_path, y_path, mountainRange(x_path, y_path) + path_elevation, strcat(color, '-'), 'LineWidth', 2); % Path line
+    quiver3(...
+        x_path(1:end-1), y_path(1:end-1), mountainRange(x_path(1:end-1), y_path(1:end-1)), ...
+        x_path(2:end)-x_path(1:end-1), y_path(2:end)-y_path(1:end-1), ...
+        mountainRange(x_path(2:end), y_path(2:end))-mountainRange(x_path(1:end-1), y_path(1:end-1)) + path_elevation, ...
+        0.5, color, 'LineWidth', 1.5);
 end
 
 alpha = 1.0; % Learning rate
@@ -51,7 +50,7 @@ num_iterations = 20;
 color = 'r';
 
 [x_path, y_path] = perform_gradient_descent(x, y, z, x0, y0, alpha, num_iterations);
-plot_path(x_path, y_path, f, color);
+plot_path(x_path, y_path, color);
 
 
 % --- Second gradient descent ---
@@ -62,7 +61,7 @@ num_iterations = 7;
 color = 'b';
 
 [x_path, y_path] = perform_gradient_descent(x, y, z, x0, y0, alpha, num_iterations);
-plot_path(x_path, y_path, f, color);
+plot_path(x_path, y_path, color);
 
 % Disable axes completely
 set(gca,'XTick',[], 'YTick', [], 'ZTick', [], 'color', 'none');
